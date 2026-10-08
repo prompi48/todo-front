@@ -3,7 +3,8 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { 
   CheckCircle2, Circle, Trash2, Plus, Clock, Settings, RefreshCw, 
   AlertCircle, Sparkles, Server, Check, X, Search, Edit2, 
-  ArrowUpDown, LogOut, User as UserIcon, Lock, Mail, ArrowRight
+  ArrowUpDown, LogOut, User as UserIcon, Lock, Mail, ArrowRight,
+  Sun, Moon
 } from 'lucide-react';
 
 
@@ -21,6 +22,8 @@ const getInitialApiUrl = () => {
 };
 
 export default function App() {
+  const [theme, setTheme] = useState(() => localStorage.getItem('taskflow_theme') || 'dark');
+
   // Auth State
   const [token, setToken] = useState(localStorage.getItem('taskflow_token') || null);
   const [currentUser, setCurrentUser] = useState(localStorage.getItem('taskflow_user') || null);
@@ -46,6 +49,12 @@ export default function App() {
   const [pendingApiUrl, setPendingApiUrl] = useState(getInitialApiUrl);
   const [isConnected, setIsConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    localStorage.setItem('taskflow_theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => setTheme((currentTheme) => currentTheme === 'dark' ? 'light' : 'dark');
 
   const getHeaders = () => ({
     'Content-Type': 'application/json',
@@ -241,16 +250,25 @@ export default function App() {
 
   if (!token) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4 selection:bg-indigo-500 selection:text-white">
+      <div data-theme={theme} className="app-shell min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4 selection:bg-indigo-500 selection:text-white">
         
-        {/* Settings button to adjust backend URL if needed */}
-        <button
-          onClick={() => setIsSettingsOpen(true)}
-          title="API Configuration"
-          className="absolute top-6 right-6 p-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white transition"
-        >
-          <Settings className="w-5 h-5" />
-        </button>
+        <div className="absolute top-6 right-6 flex gap-2">
+          <button
+            onClick={toggleTheme}
+            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+            aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+            className="p-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white transition"
+          >
+            {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+          </button>
+          <button
+            onClick={() => setIsSettingsOpen(true)}
+            title="API Configuration"
+            className="p-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white transition"
+          >
+            <Settings className="w-5 h-5" />
+          </button>
+        </div>
 
         <div className="w-full max-w-sm bg-slate-900/80 border border-slate-800 p-8 rounded-3xl shadow-2xl backdrop-blur-sm">
           <div className="flex justify-center mb-6">
@@ -261,9 +279,10 @@ export default function App() {
           <h1 className="text-2xl font-bold text-center text-white mb-2">
             TaskFlow
           </h1>
-          <p className="text-center text-slate-400 text-sm mb-8">
+          <p className="text-center text-slate-400 text-sm mb-2">
             {isAuthMode === 'login' ? 'Sign in to sync your tasks securely.' : 'Create an account to get started.'}
           </p>
+          <p className="text-center text-indigo-400 text-[10px] tracking-[0.2em] uppercase mb-7">Cosmic Cliffs · Carina Nebula</p>
 
           <form onSubmit={handleAuth} className="flex flex-col gap-4">
             {authError && (
@@ -348,7 +367,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col items-center py-8 px-4 sm:px-6 selection:bg-indigo-500 selection:text-white">
+    <div data-theme={theme} className="app-shell min-h-screen bg-slate-950 text-slate-100 flex flex-col items-center py-8 px-4 sm:px-6 selection:bg-indigo-500 selection:text-white">
       <div className="w-full max-w-2xl flex flex-col gap-6">
         
         <header className="flex flex-col gap-4 border-b border-slate-800 pb-5">
@@ -359,11 +378,19 @@ export default function App() {
               </div>
               <div>
                 <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2">TaskFlow</h1>
-                <p className="text-xs text-slate-400">Secured with JWT</p>
+                <p className="text-xs text-slate-400">COSMIC CLIFFS · CARINA NEBULA</p>
               </div>
             </div>
 
             <div className="flex items-center gap-2">
+              <button
+                onClick={toggleTheme}
+                title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+                aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+                className="p-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white transition"
+              >
+                {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              </button>
               <button onClick={() => fetchTodos(apiUrl)} title="Refresh" className="p-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white transition">
                 <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin text-indigo-400' : ''}`} />
               </button>
